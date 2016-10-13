@@ -39,6 +39,12 @@
             }
         };
     
+    function htmlToDOM(html) {
+        var tmpl = document.createElement('template');
+        tmpl.innerHTML = html;
+        return tmpl.firstChild;
+    }
+    
     todoList.Model = {
         init : function (data) {
             this.todos = data || [];
@@ -56,12 +62,29 @@
     };
     
     todoList.View = {
+        _templateSettings : {
+            todoTmpl : '<li id="<%id%>">' +
+                '<span><%title%></span>' +
+                '<div class="pull-right btns">' +
+                '<i class="glyphicon glyphicon-remove remove"></i>' +
+                '<input type="checkbox" class="toggle" <%checked%> >' +
+                '</div></li>',
+            show : function (data) {
+                var valid = this.todoTmpl.replace(/<%id%>/g, data.id).replace(/<%title%>/g, data.title).replace(/<%checked%>/g, data.completed === false ? "" : 'checked');
+                return valid;
+            }
+        },
         init : function () {
             this.$input = _("#newTodo");
+            this.$todoList = _("#todo-list");
             this.$showCompleted = _("#completed");
             this.$showActive = _("#active");
             this.$countComplete = _(".completedCount");
             this.$countActive = _(".activeCount");
+        },
+        renderOne : function (data) {
+            var item = this._templateSettings.show(data);
+            this.$todoList.appendChild(htmlToDOM(item));
         }
     };
     
