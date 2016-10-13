@@ -168,9 +168,9 @@
                 if (list.length > 0) {
                     view.render({completed : false});
                 } else {
-                    view.setNotification("No Current Tasks")
+                    view.setNotification("No Current Tasks");
                 }
-            })
+            });
         }
     };
     
