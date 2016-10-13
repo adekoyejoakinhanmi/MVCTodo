@@ -51,13 +51,17 @@
             };
             
             this.todos.push(newItem);
-            PubSubMod.publish('newItemAdded', this.todos.length);
+            PubSubMod.publish("newItemAdded", this.todos.length);
         }
     };
     
     todoList.View = {
         init : function () {
-            
+            this.$input = _("#newTodo");
+            this.$showCompleted = _("#completed");
+            this.$showActive = _("#active");
+            this.$countComplete = _(".completedCount");
+            this.$countActive = _(".activeCount");
         }
     };
     
@@ -67,6 +71,10 @@
         init : function () {
             this.model.init();
             this.view.init();
+        },
+        
+        addItem : function (title) {
+            this.model.addTodo(title);
         }
     };
 }());

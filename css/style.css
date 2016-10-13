@@ -34,7 +34,7 @@ ul#todo-list li, ul#completed-list li{
 #completed{
     margin-bottom: 10px;
 }
-@media (max-width: 768px){
+@media (max-width: 991px){
     #completed {
         margin-bottom: 0px;
     }
