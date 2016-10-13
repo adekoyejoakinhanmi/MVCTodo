@@ -6,6 +6,8 @@
     'use strict';
     /*
     - How I intend for this branch to work
+    - Use an EVENT system to handle events
+    
     * The Model/Store will keep track of the Data with the following methods - 
         * init
         * create
@@ -20,6 +22,44 @@
         * init and binding
     */
     var _ = document.querySelector.bind(document),
-        todoList = {};
+        todoList = {},
+        PubSubMod = {
+            subscribers : {},
+            subscribe: function (subName, func) {
+                this.subscribers[subName] = this.subscribers[subName] || [];
+                this.subscribers[subName].push(func);
+            },
+            publish : function (subName, event) {
+                var i;
+                if (this.subscribers[subName]) {
+                    this.subscribers[subName].forEach(function (fn) {
+                        fn(event);
+                    });
+                }
+            }
+        };
     
+    todoList.Model = {
+        init : function (data) {
+            this.todos = data || [];
+        },
+        addTodo : function (title) {
+            var newItem;
+        }
+    };
+    
+    todoList.View = {
+        init : function () {
+            
+        }
+    };
+    
+    todoList.Controller = {
+        view : todoList.View,
+        model : todoList.Model,
+        init : function () {
+            this.model.init();
+            this.view.init();
+        }
+    };
 }());

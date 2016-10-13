@@ -31,6 +31,9 @@ ul#todo-list li, ul#completed-list li{
 .hidden{
     display: none;
 }
+#showCompleted{
+    margin-bottom: 10px;
+}
 @keyframes slide-in{
     0%{
         transform: translateY(100%);
