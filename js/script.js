@@ -22,6 +22,7 @@
         * init and binding
     */
     var _ = document.querySelector.bind(document),
+        __ = document.querySelectorAll.bind(document),
         todoList = {},
         PubSubMod = (function () {
             var topics = {},
@@ -58,8 +59,22 @@
     }
     
     
-    function $on(el, event, fn) {
-        el.addEventListener(event, fn);
+    function $on(el, event, fn, useCapture) {
+        el.addEventListener(event, fn, !!useCapture);
+    }
+    
+    function $delegate(el, selector, type, fn) {
+        function despatchEvt(event) {
+            var target = event.target,
+                potentialEls = __(selector, target),
+                hasMatch = Array.prototype.indexOf(potentialEls, target) >= 0;
+            if (hasMatch) {
+                fn.call(target, event);
+            }
+        }
+        
+        var useCapture = type === 'blur' || type === 'focus';
+        $on(el, type, despatchEvt, useCapture);
     }
     
     todoList.Model = {
@@ -75,6 +90,19 @@
             
             this.todos.push(newItem);
             PubSubMod.publish("newItemAdded", newItem);
+        },
+        removeTodo : function (id) {
+            var i,
+                todos = this.todos,
+                l = todos.length;
+            
+            for (i = 0; i < l; i += 1) {
+                if (id === todos[i][id]) {
+                    todos.splice(i, 1);
+                    break;
+                }
+            }
+            PubSubMod.publish("itemRemoved", {index : i, id : id});
         }
     };
     
@@ -105,6 +133,10 @@
             var self = todoList.View,
                 item = self._templateSettings.show(data);
             self.$todoList.appendChild(htmlToDOM(item));
+        },
+        removeEl : function (id) {
+            var item = _("#" + id);
+            this.$todoList.removeChild(item);
         },
         clearInput : function () {
             this.$input.value = "";
@@ -143,6 +175,10 @@
                     view.clearInput();
                 }
             });
+            
+            $delegate(view.$todoList, "click", ".remove", function () {
+                
+            });
         },
         _addItem : function (title) {
             if (title.trim() === "") {
@@ -150,6 +186,9 @@
             }
             
             this.model.addTodo(title);
+        },
+        _removeItem : function () {
+            this.model.removeTodo();
         }
     };
     
