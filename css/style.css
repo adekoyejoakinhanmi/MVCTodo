@@ -31,8 +31,13 @@ ul#todo-list li, ul#completed-list li{
 .hidden{
     display: none;
 }
-#showCompleted{
+#completed{
     margin-bottom: 10px;
+}
+@media (max-width: 768px){
+    #completed {
+        margin-bottom: 0px;
+    }
 }
 @keyframes slide-in{
     0%{

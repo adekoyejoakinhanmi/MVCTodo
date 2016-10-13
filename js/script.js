@@ -44,7 +44,14 @@
             this.todos = data || [];
         },
         addTodo : function (title) {
-            var newItem;
+            var newItem = {
+                completed : false,
+                id : Date.now(),
+                title : title
+            };
+            
+            this.todos.push(newItem);
+            PubSubMod.publish('newItemAdded', this.todos.length);
         }
     };
     
