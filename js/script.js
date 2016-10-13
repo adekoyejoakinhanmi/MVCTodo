@@ -23,26 +23,43 @@
     */
     var _ = document.querySelector.bind(document),
         todoList = {},
-        PubSubMod = {
-            subscribers : {},
-            subscribe: function (subName, func) {
-                this.subscribers[subName] = this.subscribers[subName] || [];
-                this.subscribers[subName].push(func);
-            },
-            publish : function (subName, event) {
-                var i;
-                if (this.subscribers[subName]) {
-                    this.subscribers[subName].forEach(function (fn) {
-                        fn(event);
+        PubSubMod = (function () {
+            var topics = {},
+                hOP = topics.hasOwnProperty;
+
+            return {
+                subscribe: function (topic, listener) {
+                    if (!hOP.call(topics, topic)) {
+                        topics[topic] = [];
+                    }
+                    var index = topics[topic].push(listener) - 1;
+                    
+                    return {
+                        remove: function () {
+                            delete topics[topic][index];
+                        }
+                    };
+                },
+                publish: function (topic, info) {
+                    if (!hOP.call(topics, topic)) {
+                        return;
+                    }
+                    topics[topic].forEach(function (item) {
+                        item(info !== undefined ? info : {});
                     });
                 }
-            }
-        };
+            };
+        }());
     
     function htmlToDOM(html) {
         var tmpl = document.createElement('template');
         tmpl.innerHTML = html;
-        return tmpl.firstChild;
+        return tmpl.content.firstChild;
+    }
+    
+    
+    function $on(el, event, fn) {
+        el.addEventListener(event, fn);
     }
     
     todoList.Model = {
@@ -57,7 +74,7 @@
             };
             
             this.todos.push(newItem);
-            PubSubMod.publish("newItemAdded", this.todos.length);
+            PubSubMod.publish("newItemAdded", newItem);
         }
     };
     
@@ -78,13 +95,27 @@
             this.$input = _("#newTodo");
             this.$todoList = _("#todo-list");
             this.$showCompleted = _("#completed");
+            this.$notification = _('.notification');
             this.$showActive = _("#active");
             this.$countComplete = _(".completedCount");
             this.$countActive = _(".activeCount");
         },
         renderOne : function (data) {
-            var item = this._templateSettings.show(data);
-            this.$todoList.appendChild(htmlToDOM(item));
+            /*Manually Setting value of this*/
+            var self = todoList.View,
+                item = self._templateSettings.show(data);
+            self.$todoList.appendChild(htmlToDOM(item));
+        },
+        clearInput : function () {
+            this.$input.value = "";
+            console.log(this);
+        },
+        toggleNotifcation : function () {
+            if (this.$notification.classList.contains('hidden')) {
+                this.$notification.classList.remove("hidden");
+            } else {
+                this.$notification.classList.add("hidden");
+            }
         }
     };
     
@@ -94,10 +125,35 @@
         init : function () {
             this.model.init();
             this.view.init();
+            this.bindEvents();
+            
+            PubSubMod.subscribe('newItemAdded', this.view.renderOne);
         },
-        
-        addItem : function (title) {
+        bindEvents : function () {
+            var view = this.view,
+                model = this.model,
+                self = this;
+            
+            $on(view.$input, 'keypress', function (e) {
+                if (e.keyCode === 13) {
+                    var val = view.$input.value;
+                    
+                    self.view.toggleNotifcation();
+                    self._addItem(val);
+                    view.clearInput();
+                }
+            });
+        },
+        _addItem : function (title) {
+            if (title.trim() === "") {
+                return;
+            }
+            
             this.model.addTodo(title);
         }
     };
+    
+    todoList.Controller.init();
+    
+    window.todoList = todoList;
 }());
