@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <p>&nbsp;</p>
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-md-10">
+                <div class="addTodo input-group">
+                    <input type="text" class="form-control" id="newTodo" placeholder="New Task">
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" id="addTodo" type="button">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        </button>
+                    </span>
+                </div>
+                <ul id="todo-list">
+                    <div class="notification panel">
+                        <p class="text-center">No Current tasks</p>
+                    </div>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <button id="completed" class="btn btn-primary">Show completed</button>
+                <button id="active" class="btn btn-primary">Show Active</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
