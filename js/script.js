@@ -58,7 +58,6 @@
         return tmpl.content.firstChild;
     }
     
-    
     function $on(el, event, fn, useCapture) {
         el.addEventListener(event, fn, !!useCapture);
     }
@@ -102,13 +101,13 @@
                     break;
                 }
             }
-            PubSubMod.publish("itemRemoved", {index : i, id : id});
+            PubSubMod.publish("itemRemoved", id);
         }
     };
     
     todoList.View = {
         _templateSettings : {
-            todoTmpl : '<li id="<%id%>">' +
+            todoTmpl : '<li data-id="<%id%>">' +
                 '<span><%title%></span>' +
                 '<div class="pull-right btns">' +
                 '<i class="glyphicon glyphicon-remove remove"></i>' +
@@ -132,20 +131,22 @@
             /*Manually Setting value of this*/
             var self = todoList.View,
                 item = self._templateSettings.show(data);
-            self.$todoList.appendChild(htmlToDOM(item));
+            
+            if (item) {
+                self.$todoList.appendChild(htmlToDOM(item));
+            }
         },
         removeEl : function (id) {
-            var item = _("#" + id);
-            this.$todoList.removeChild(item);
+            var item = _('[data-id="' + id + '"]'),
+                /*Manually Setting value of this*/
+                self = todoList.View;
+            self.$todoList.removeChild(item);
         },
         clearInput : function () {
             this.$input.value = "";
-            console.log(this);
         },
-        toggleNotifcation : function () {
-            if (this.$notification.classList.contains('hidden')) {
-                this.$notification.classList.remove("hidden");
-            } else {
+        removeNotifcation : function () {
+            if (!this.$notification.classList.contains('hidden')) {
                 this.$notification.classList.add("hidden");
             }
         }
@@ -160,6 +161,7 @@
             this.bindEvents();
             
             PubSubMod.subscribe('newItemAdded', this.view.renderOne);
+            //PubSubMod.subscribe('itemRemoved', this.view.removeEl);
         },
         bindEvents : function () {
             var view = this.view,
@@ -170,14 +172,18 @@
                 if (e.keyCode === 13) {
                     var val = view.$input.value;
                     
-                    self.view.toggleNotifcation();
+                    self.view.removeNotifcation();
                     self._addItem(val);
                     view.clearInput();
                 }
             });
             
-            $delegate(view.$todoList, "click", ".remove", function () {
-                
+            view.$todoList.addEventListener("click", function (e) {
+                if (e.target.matches('.remove')) {
+                    var id = self._itemId(e.target);
+                    view.removeEl(id);
+                    self._removeItem(id);
+                }
             });
         },
         _addItem : function (title) {
@@ -187,8 +193,15 @@
             
             this.model.addTodo(title);
         },
-        _removeItem : function () {
-            this.model.removeTodo();
+        _itemId : function (el) {
+            var item = el.parentNode.parentNode;
+            if (item.nodeName.toLowerCase() !== "li") {
+                return;
+            }
+            return parseInt(item.id, 10);
+        },
+        _removeItem : function (id) {
+            this.model.removeTodo(id);
         }
     };
     
