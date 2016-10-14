@@ -133,7 +133,7 @@
                 item = self._templateSettings.show(data);
             
             if (item) {
-                self.$todoList.appendChild(htmlToDOM(item));
+                self.$todoList.insertBefore(htmlToDOM(item),self.$todoList.firstChild);
             }
         },
         removeEl : function (id) {
@@ -145,9 +145,12 @@
         clearInput : function () {
             this.$input.value = "";
         },
-        removeNotifcation : function () {
-            if (!this.$notification.classList.contains('hidden')) {
+        toggleNotifcation : function () {
+            //console.log(this.$todoList.firstChild);
+            if (this.$todoList.innerHTML !== "") {
                 this.$notification.classList.add("hidden");
+            } else {
+                this.$notification.classList.remove("hidden");
             }
         }
     };
@@ -161,7 +164,7 @@
             this.bindEvents();
             
             PubSubMod.subscribe('newItemAdded', this.view.renderOne);
-            //PubSubMod.subscribe('itemRemoved', this.view.removeEl);
+            PubSubMod.subscribe('itemRemoved', this.view.removeEl);
         },
         bindEvents : function () {
             var view = this.view,
@@ -172,19 +175,20 @@
                 if (e.keyCode === 13) {
                     var val = view.$input.value;
                     
-                    self.view.removeNotifcation();
+                    self.view.toggleNotifcation();
                     self._addItem(val);
                     view.clearInput();
                 }
             });
             
-            view.$todoList.addEventListener("click", function (e) {
+            $on(view.$todoList, 'click', function (e) {
                 if (e.target.matches('.remove')) {
                     var id = self._itemId(e.target);
-                    view.removeEl(id);
                     self._removeItem(id);
+                    view.toggleNotifcation();
                 }
             });
+            
         },
         _addItem : function (title) {
             if (title.trim() === "") {
@@ -198,10 +202,13 @@
             if (item.nodeName.toLowerCase() !== "li") {
                 return;
             }
-            return parseInt(item.id, 10);
+            return parseInt(item.dataset.id, 10);
         },
         _removeItem : function (id) {
             this.model.removeTodo(id);
+        },
+        _toggleItem : function (id) {
+            
         }
     };
     
