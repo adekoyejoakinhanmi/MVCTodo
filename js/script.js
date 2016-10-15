@@ -9,17 +9,18 @@
     - Use an EVENT system to handle events
     
     * The Model/Store will keep track of the Data with the following methods - 
-        * init
-        * create
-        * save
-        * find
+        * init ++
+        * add  ++
+        * remove ++
+        * save --
+        * find --
     * The View will manage the DOM like so -
-        * init
-        * removeEl
-        * renderOne
+        * init ++
+        * removeEl ++
+        * renderOne ++
         * renderAll
     * The Controller will glue the above by -
-        * init and binding
+        * init and binding ++
     */
     var _ = document.querySelector.bind(document),
         __ = document.querySelectorAll.bind(document),
@@ -102,6 +103,19 @@
                 }
             }
             PubSubMod.publish("itemRemoved", id);
+        },
+        toggleTodo : function (id) {
+            var i,
+                todos = this.todos,
+                l = todos;
+            
+            for (i = 0; i < l; i += 1) {
+                if (id === todos[i][id]) {
+                    todos[i].completed = !todos[i].completed;
+                    break;
+                }
+            }
+            PubSubMod.publish("itemChanged", id);
         }
     };
     
@@ -133,7 +147,7 @@
                 item = self._templateSettings.show(data);
             
             if (item) {
-                self.$todoList.insertBefore(htmlToDOM(item),self.$todoList.firstChild);
+                self.$todoList.insertBefore(htmlToDOM(item), self.$todoList.firstChild);
             }
         },
         removeEl : function (id) {
@@ -141,6 +155,13 @@
                 /*Manually Setting value of this*/
                 self = todoList.View;
             self.$todoList.removeChild(item);
+        },
+        toggleCompleted : function (id) {
+            var item = _('[data-id="' + id + '"]'),
+                self = todoList.View;
+            
+            item.classList.toggle("completed");
+            console.log(item);
         },
         clearInput : function () {
             this.$input.value = "";
@@ -165,6 +186,7 @@
             
             PubSubMod.subscribe('newItemAdded', this.view.renderOne);
             PubSubMod.subscribe('itemRemoved', this.view.removeEl);
+            PubSubMod.subscribe('itemChanged', this.view.toggleCompleted);
         },
         bindEvents : function () {
             var view = this.view,
@@ -189,12 +211,18 @@
                 }
             });
             
+            $on(view.$todoList, "click", function (e) {
+                if (e.target.matches('.toggle')) {
+                    var id = self._itemId(e.target);
+                    self._toggleItem(id);
+                }
+            });
+            
         },
         _addItem : function (title) {
             if (title.trim() === "") {
                 return;
             }
-            
             this.model.addTodo(title);
         },
         _itemId : function (el) {
@@ -208,7 +236,7 @@
             this.model.removeTodo(id);
         },
         _toggleItem : function (id) {
-            
+            this.model.toggleTodo(id);
         }
     };
     

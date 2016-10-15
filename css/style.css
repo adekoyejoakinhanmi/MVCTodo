@@ -10,14 +10,17 @@ body{
     margin: 0;
     padding: 0
 }
-ul#todo-list, ul#completed-list{
+ul#todo-list{
     margin-top: 20px;
     padding: 0;
 }
-ul#todo-list li, ul#completed-list li{
+ul#todo-list li{
     list-style-type: none;
     padding: 10px;
     animation: slide-in 0.5s;
+}
+ul#todo-list li span{
+    font-size: 1.1em;
 }
 .btns .glyphicon-remove{
     font-size: 18px;
@@ -33,6 +36,10 @@ ul#todo-list li, ul#completed-list li{
 }
 #completed{
     margin-bottom: 10px;
+}
+.completed span{
+    text-decoration: line-through;
+    color: #ccc;
 }
 @media (max-width: 991px){
     #completed {
