@@ -85,7 +85,7 @@
 			return element.parentNode;
 		}
 		return $parent(element.parentNode, tagName);
-	};
+	}
     
     todoList.Model = {
         init : function (data) {
@@ -216,12 +216,12 @@
             });
             
             $on(view.$todoList, 'click', function (e) {
+                var id = self._itemId(e.target);
+                
                 if (e.target.matches('.remove')) {
-                    var id = self._itemId(e.target);
                     self._removeItem(id);
                     view.toggleNotifcation();
                 } else if (e.target.matches('.toggle')) {
-                    var id = self._itemId(e.target);
                     self._toggleItem(id);
                 }
             });
