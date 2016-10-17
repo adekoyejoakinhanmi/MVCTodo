@@ -10,20 +10,31 @@ body{
     margin: 0;
     padding: 0
 }
-ul#todo-list, ul#completed-list{
+ul#todo-list{
     margin-top: 20px;
     padding: 0;
 }
-ul#todo-list li, ul#completed-list li{
+ul#todo-list li{
     list-style-type: none;
     padding: 10px;
-    animation: slide-in 0.5s;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    animation: fade-in 0.9s;
+}
+ul#todo-list li:first-child{
+    border-top: none;
+}
+ul#todo-list li input[type=checkbox]{
+    vertical-align: top;
+    border: none;
+    background: transparent;
+}
+ul#todo-list li span{
+    font-size: 1.2em;
+    padding: 0px 10px;
 }
 .btns .glyphicon-remove{
     font-size: 18px;
     vertical-align: top;
-    padding: 0px 10px;
-    border-right: 1px solid rgba(0,0,0,0.4);
     margin-right: 10px;
     display: inline-block;
     cursor: pointer;
@@ -31,11 +42,25 @@ ul#todo-list li, ul#completed-list li{
 .hidden{
     display: none;
 }
-@keyframes slide-in{
+#completed{
+    margin-bottom: 10px;
+}
+.completed span{
+    text-decoration: line-through;
+    color: #ccc;
+}
+@media (max-width: 991px){
+    #completed {
+        margin-bottom: 0px;
+    }
+}
+@keyframes fade-in{
     0%{
-        transform: translateY(100%);
+        opacity: 0;
+        /*transform: translateY(-100%);*/
     }
     100%{
-        transform: translateY(0%);
+        opacity: 1;
+        /*transform: translateY(0%);*/
     }
 }

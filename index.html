@@ -12,13 +12,8 @@
         
         <div class="row">
             <div class="col-md-10">
-                <div class="addTodo input-group">
+                <div class="addTodo form-group">
                     <input type="text" class="form-control" id="newTodo" placeholder="New Task">
-                    <span class="input-group-btn">
-                        <button class="btn btn-success" id="addTodo" type="button">
-                        <i class="glyphicon glyphicon-plus"></i>
-                        </button>
-                    </span>
                 </div>
                 <ul id="todo-list">
                     <div class="notification panel">
@@ -27,8 +22,14 @@
                 </ul>
             </div>
             <div class="col-md-2">
-                <button id="completed" class="btn btn-primary">Show completed</button>
-                <button id="active" class="btn btn-primary">Show Active</button>
+                <button id="completed" class="btn btn-primary">
+                    Show completed
+                    <span class="badge completedCount">4</span>
+                </button>
+                <button id="active" class="btn btn-primary">
+                    Show Active
+                    <span class="badge activeCount">4</span>
+                </button>
             </div>
         </div>
     </div>

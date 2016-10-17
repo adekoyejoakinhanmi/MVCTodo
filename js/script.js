@@ -4,71 +4,138 @@
 */
 (function () {
     'use strict';
-    var TodoListApp = {},
-        _ = document.querySelector.bind(document),
-        __ = document.querySelectorAll.bind(document);
+    /*
+    - How I intend for this branch to work
+    - Use an EVENT system to handle events
     
-    function htmlToElement(html) {
-        var template = document.createElement('template');
-        template.innerHTML = html;
-        return template.content.firstChild;
+    * The Model/Store will keep track of the Data with the following methods - 
+        * init ++
+        * add  ++
+        * remove ++
+        * save --
+        * find --
+    * The View will manage the DOM like so -
+        * init ++
+        * removeEl ++
+        * renderOne ++
+        * renderAll
+    * The Controller will glue the above by -
+        * init and binding ++
+    */
+    var _ = document.querySelector.bind(document),
+        __ = document.querySelectorAll.bind(document),
+        todoList = {},
+        PubSubMod = (function () {
+            var topics = {},
+                hOP = topics.hasOwnProperty;
+
+            return {
+                subscribe: function (topic, listener) {
+                    if (!hOP.call(topics, topic)) {
+                        topics[topic] = [];
+                    }
+                    var index = topics[topic].push(listener) - 1;
+                    
+                    return {
+                        remove: function () {
+                            delete topics[topic][index];
+                        }
+                    };
+                },
+                publish: function (topic, info) {
+                    if (!hOP.call(topics, topic)) {
+                        return;
+                    }
+                    topics[topic].forEach(function (item) {
+                        item(info !== undefined ? info : {});
+                    });
+                }
+            };
+        }());
+    
+    function htmlToDOM(html) {
+        var tmpl = document.createElement('template');
+        tmpl.innerHTML = html;
+        return tmpl.content.firstChild;
     }
     
-    TodoListApp.Model = {
+    function $on(el, event, fn, useCapture) {
+        el.addEventListener(event, fn, !!useCapture);
+    }
+    
+    function $delegate(el, selector, type, fn) {
+        function despatchEvt(event) {
+            var target = event.target,
+                potentialEls = __(selector, target),
+                hasMatch = Array.prototype.indexOf(potentialEls, target) >= 0;
+            if (hasMatch) {
+                fn.call(target, event);
+            }
+        }
+        
+        var useCapture = type === 'blur' || type === 'focus';
+        $on(el, type, despatchEvt, useCapture);
+    }
+    
+    function $parent(element, tagName) {
+		if (!element.parentNode) {
+			return;
+		}
+		if (element.parentNode.tagName.toLowerCase() === tagName.toLowerCase()) {
+			return element.parentNode;
+		}
+		return $parent(element.parentNode, tagName);
+	}
+    
+    todoList.Model = {
         init : function (data) {
             this.todos = data || [];
         },
         addTodo : function (title) {
-            var ID = Date.now();
+            var newItem = {
+                completed : false,
+                id : Date.now(),
+                title : title
+            };
             
-            this.todos.push({
-                id : ID,
-                title : title,
-                completed : false
-            });
-        },
-        find : function (query) {
-            var i,
-                list = this.todos,
-                queries = list.filter(function (todo) {
-                    if (query.completed !== todo.completed) {
-                        return false;
-                    }
-                    return true;
-                });
-            
-            return queries;
+            this.todos.push(newItem);
+            PubSubMod.publish("newItemAdded", newItem);
         },
         removeTodo : function (id) {
-            var i = 0,
-                l = this.todos.length;
+            var i,
+                todos = this.todos,
+                l = todos.length;
             
-            while (i < l) {
-                if (this.todos[i].id === id) {
-                    this.todos[i].completed = !this.todos[i].completed;
-                }
-            }
-        },
-        toggleTodo : function (id) {
-            var i = 0,
-                l = this.todos.length;
-            
-            while (i < l) {
-                if (this.todos[i].id === id) {
-                    this.todos[i].completed = !this.todos[i].completed;
+            for (i = 0; i < l; i += 1) {
+                if (id === todos[i][id]) {
+                    todos.splice(i, 1);
                     break;
                 }
             }
+            PubSubMod.publish("itemRemoved", id);
+        },
+        toggleTodo : function (id) {
+            var i,
+                todos = this.todos,
+                l = todos;
+            
+            for (i = 0; i < l; i += 1) {
+                if (id === todos[i][id]) {
+                    todos[i].completed = !todos[i].completed;
+                    break;
+                }
+            }
+            PubSubMod.publish("itemChanged", id);
         }
     };
     
-    TodoListApp.View = {
+    todoList.View = {
         _templateSettings : {
-            todoTmpl : '<li id="<%id%>">' +
+            todoTmpl : '<li data-id="<%id%>">' +
+                '<input type="checkbox" class="toggle" <%checked%> >' +
                 '<span><%title%></span>' +
                 '<div class="pull-right btns">' +
                 '<i class="glyphicon glyphicon-remove remove"></i>' +
-                '<input type="checkbox" class="toggle" <%checked%> >' +
                 '</div></li>',
             show : function (data) {
                 var valid = this.todoTmpl.replace(/<%id%>/g, data.id).replace(/<%title%>/g, data.title).replace(/<%checked%>/g, data.completed === false ? "" : 'checked');
@@ -76,105 +143,112 @@
             }
         },
         init : function () {
-            this.$todoList = _('#todo-list');
-            this.$showCompleted = _("#completed");
-            this.$showActive  = _("#active");
             this.$input = _("#newTodo");
-            this.$addBtn = _("#addTodo");
-            this.$notification = _(".notification");
-        },
-        removeEl : function (el) {
-            var item = el.parentNode.parentNode,
-                parent = item.parentNode;
+            this.$todoList = _("#todo-list");
+            this.$showCompleted = _("#completed");
+            this.$notification = _('.notification');
+            this.$showActive = _("#active");
+            this.$countComplete = _(".completedCount");
+            this.$countActive = _(".activeCount");
             
-            parent.removeChild(item);
-            return this;
+            this.focusTodo();
+        },
+        renderOne : function (data) {
+            /*Manually Setting value of this*/
+            var self = todoList.View,
+                item = self._templateSettings.show(data);
+            
+            if (item) {
+                self.$todoList.insertBefore(htmlToDOM(item), self.$todoList.firstChild);
+            }
+        },
+        removeEl : function (id) {
+            var item = _('[data-id="' + id + '"]'),
+                /*Manually Setting value of this*/
+                self = todoList.View;
+            self.$todoList.removeChild(item);
+        },
+        toggleCompleted : function (id) {
+            var item = _('[data-id="' + id + '"]'),
+                self = todoList.View;
+            
+            item.classList.toggle("completed");
+            console.log(item);
         },
         clearInput : function () {
             this.$input.value = "";
         },
-        setNotification : function (notification) {
-            var p = '<div class="notification panel"><p class="text-center">' + notification + '</p></div>',
-                n = this.$notification.innerHTML = p;
-            this.$todoList.innerHTML = n;
-        },
-        render : function (query) {
-            var list = TodoListApp.Controller.getTodos(query),
-                html = "",
-                self = this;
-            
-            this.$todoList.innerHTML = "";
-            
-            list.forEach(function (todo) {
-                var item = self._templateSettings.show(todo);
-                html += item;
-            });
-            this.$todoList.innerHTML = html;
-            return this;
+        toggleNotifcation : function () {
+            //console.log(this.$todoList.firstChild);
+            if (this.$todoList.innerHTML !== "") {
+                this.$notification.classList.add("hidden");
+            } else {
+                this.$notification.classList.remove("hidden");
+            }
         }
     };
     
-    TodoListApp.Controller = {
-        model : TodoListApp.Model,
-        view : TodoListApp.View,
+    todoList.Controller = {
+        view : todoList.View,
+        model : todoList.Model,
         init : function () {
             this.model.init();
             this.view.init();
             this.bindEvents();
-        },
-        getTodos : function (query) {
-            return this.model.find(query);
+            
+            PubSubMod.subscribe('newItemAdded', this.view.renderOne);
+            PubSubMod.subscribe('itemRemoved', this.view.removeEl);
+            PubSubMod.subscribe('itemChanged', this.view.toggleCompleted);
         },
         bindEvents : function () {
-            var self = this,
-                view = this.view,
-                model = this.model;
+            var view = this.view,
+                model = this.model,
+                self = this;
             
-            view.$addBtn.addEventListener('click', function (e) {
-                var title = view.$input.value.trim();
-                model.addTodo(title);
-                view.render({completed : false});
-                view.clearInput();
-            });
-            
-            view.$todoList.addEventListener('click', function (e) {
-                var el = e.target,
-                    parent = el.parentNode.parentNode;
-                if (el.nodeName.toLowerCase() === "i") {
-                    model.removeTodo(parseInt(parent.id, 10));
-                    view.removeEl(el);
-                    if (view.$todoList.innerHTML === "") {
-                        view.setNotification("No More Tasks, Yay!");
-                    }
-                } else if (el.nodeName.toLowerCase() === "input") {
-                    model.toggleTodo(parseInt(parent.id, 10));
-                    view.render({completed : false});
+            $on(view.$input, 'keypress', function (e) {
+                if (e.keyCode === 13) {
+                    var val = view.$input.value;
+                    
+                    self.view.toggleNotifcation();
+                    self._addItem(val);
+                    view.clearInput();
                 }
             });
             
-            view.$showCompleted.addEventListener('click', function () {
-                var list = model.find({completed : true});
+            $on(view.$todoList, 'click', function (e) {
+                var id = self._itemId(e.target);
                 
-                if (list.length > 0) {
-                    view.render({completed : true});
-                } else {
-                    view.setNotification("No completed Task");
+                if (e.target.matches('.remove')) {
+                    self._removeItem(id);
+                    view.toggleNotifcation();
+                } else if (e.target.matches('.toggle')) {
+                    self._toggleItem(id);
                 }
             });
-            
-            view.$showActive.addEventListener("click", function () {
-                var list = model.find({completed : false});
-                
-                if (list.length > 0) {
-                    view.render({completed : false});
-                } else {
-                    view.setNotification("No Current Tasks");
-                }
-            });
+        },
+        _addItem : function (title) {
+            if (title.trim() === "") {
+                return;
+            }
+            this.model.addTodo(title);
+        },
+        _itemId : function (el) {
+            var item = $parent(el, 'li');
+            /*
+            if (item.nodeName.toLowerCase() !== "li") {
+                return;
+            }*/
+            return parseInt(item.dataset.id, 10);
+        },
+        _removeItem : function (id) {
+            this.model.removeTodo(id);
+        },
+        _toggleItem : function (id) {
+            this.model.toggleTodo(id);
         }
     };
     
-    TodoListApp.Controller.init();
+    todoList.Controller.init();
     
-    window.TodoList = TodoListApp;
+    window.todoList = todoList;
 }());
