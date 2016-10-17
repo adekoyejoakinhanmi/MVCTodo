@@ -17,16 +17,24 @@ ul#todo-list{
 ul#todo-list li{
     list-style-type: none;
     padding: 10px;
-    animation: slide-in 0.5s;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    animation: fade-in 0.9s;
+}
+ul#todo-list li:first-child{
+    border-top: none;
+}
+ul#todo-list li input[type=checkbox]{
+    vertical-align: top;
+    border: none;
+    background: transparent;
 }
 ul#todo-list li span{
-    font-size: 1.1em;
+    font-size: 1.2em;
+    padding: 0px 10px;
 }
 .btns .glyphicon-remove{
     font-size: 18px;
     vertical-align: top;
-    padding: 0px 10px;
-    border-right: 1px solid rgba(0,0,0,0.4);
     margin-right: 10px;
     display: inline-block;
     cursor: pointer;
@@ -46,11 +54,13 @@ ul#todo-list li span{
         margin-bottom: 0px;
     }
 }
-@keyframes slide-in{
+@keyframes fade-in{
     0%{
-        transform: translateY(-100%);
+        opacity: 0;
+        /*transform: translateY(-100%);*/
     }
     100%{
-        transform: translateY(0%);
+        opacity: 1;
+        /*transform: translateY(0%);*/
     }
 }

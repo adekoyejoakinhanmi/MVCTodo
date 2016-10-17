@@ -77,6 +77,16 @@
         $on(el, type, despatchEvt, useCapture);
     }
     
+    function $parent(element, tagName) {
+		if (!element.parentNode) {
+			return;
+		}
+		if (element.parentNode.tagName.toLowerCase() === tagName.toLowerCase()) {
+			return element.parentNode;
+		}
+		return $parent(element.parentNode, tagName);
+	};
+    
     todoList.Model = {
         init : function (data) {
             this.todos = data || [];
@@ -122,10 +132,10 @@
     todoList.View = {
         _templateSettings : {
             todoTmpl : '<li data-id="<%id%>">' +
+                '<input type="checkbox" class="toggle" <%checked%> >' +
                 '<span><%title%></span>' +
                 '<div class="pull-right btns">' +
                 '<i class="glyphicon glyphicon-remove remove"></i>' +
-                '<input type="checkbox" class="toggle" <%checked%> >' +
                 '</div></li>',
             show : function (data) {
                 var valid = this.todoTmpl.replace(/<%id%>/g, data.id).replace(/<%title%>/g, data.title).replace(/<%checked%>/g, data.completed === false ? "" : 'checked');
@@ -140,6 +150,8 @@
             this.$showActive = _("#active");
             this.$countComplete = _(".completedCount");
             this.$countActive = _(".activeCount");
+            
+            this.focusTodo();
         },
         renderOne : function (data) {
             /*Manually Setting value of this*/
@@ -208,16 +220,11 @@
                     var id = self._itemId(e.target);
                     self._removeItem(id);
                     view.toggleNotifcation();
-                }
-            });
-            
-            $on(view.$todoList, "click", function (e) {
-                if (e.target.matches('.toggle')) {
+                } else if (e.target.matches('.toggle')) {
                     var id = self._itemId(e.target);
                     self._toggleItem(id);
                 }
             });
-            
         },
         _addItem : function (title) {
             if (title.trim() === "") {
@@ -226,10 +233,11 @@
             this.model.addTodo(title);
         },
         _itemId : function (el) {
-            var item = el.parentNode.parentNode;
+            var item = $parent(el, 'li');
+            /*
             if (item.nodeName.toLowerCase() !== "li") {
                 return;
-            }
+            }*/
             return parseInt(item.dataset.id, 10);
         },
         _removeItem : function (id) {
