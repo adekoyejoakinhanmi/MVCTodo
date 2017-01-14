@@ -25,6 +25,7 @@
     var _ = document.querySelector.bind(document),
         __ = document.querySelectorAll.bind(document),
         todoList = {},
+		//Source - David Walsh Blog
         PubSubMod = (function () {
             var topics = {},
                 hOP = topics.hasOwnProperty;
@@ -90,6 +91,9 @@
     todoList.Model = {
         init : function (data) {
             this.todos = data || [];
+			this.count  = {
+				active : 0
+			};
         },
         addTodo : function (title) {
             var newItem = {
@@ -99,6 +103,7 @@
             };
             
             this.todos.push(newItem);
+			
             PubSubMod.publish("newItemAdded", newItem);
         },
         removeTodo : function (id) {
@@ -106,27 +111,51 @@
                 todos = this.todos,
                 l = todos.length;
             
-            for (i = 0; i < l; i += 1) {
-                if (id === todos[i][id]) {
+            for (i = 0; i < l; i++) {
+                if (id == todos[i]['id']) {
                     todos.splice(i, 1);
                     break;
                 }
             }
+			console.log(todos.length, id);
             PubSubMod.publish("itemRemoved", id);
         },
         toggleTodo : function (id) {
             var i,
                 todos = this.todos,
-                l = todos;
+                l = todos.length;
             
             for (i = 0; i < l; i += 1) {
-                if (id === todos[i][id]) {
-                    todos[i].completed = !todos[i].completed;
+                if (id === todos[i]['id']) {
+                    todos[i]['completed'] = !todos[i]['completed'];
+					console.log(todos[i]['completed']);
                     break;
                 }
             }
             PubSubMod.publish("itemChanged", id);
-        }
+        },
+		getCount : function () {
+			var todosCount = {
+				active: 0,
+				completed: 0,
+				total: 0
+			};
+			var i,
+                todos = this.todos,
+                l = todos.length;
+            
+            for (i = 0; i < l; i += 1) {
+				if (todos[i]['completed']) {
+					todosCount.completed++;
+				} else {
+					todosCount.active++;
+				}
+
+				todosCount.total++;
+			}
+			
+			PubSubMod.publish("count", todosCount);
+		}
     };
     
     todoList.View = {
@@ -151,7 +180,7 @@
             this.$countComplete = _(".completedCount");
             this.$countActive = _(".activeCount");
             
-            this.focusTodo();
+            //this.focusTodo();
         },
         renderOne : function (data) {
             /*Manually Setting value of this*/
@@ -169,11 +198,9 @@
             self.$todoList.removeChild(item);
         },
         toggleCompleted : function (id) {
-            var item = _('[data-id="' + id + '"]'),
-                self = todoList.View;
+            var item = _('[data-id="' + id + '"]');
             
             item.classList.toggle("completed");
-            console.log(item);
         },
         clearInput : function () {
             this.$input.value = "";
@@ -185,7 +212,12 @@
             } else {
                 this.$notification.classList.remove("hidden");
             }
-        }
+        },
+		updateCount : function (values) {
+			var self = todoList.View;
+			
+			self.$countActive.innerHTML = values.total;
+		}
     };
     
     todoList.Controller = {
@@ -199,6 +231,8 @@
             PubSubMod.subscribe('newItemAdded', this.view.renderOne);
             PubSubMod.subscribe('itemRemoved', this.view.removeEl);
             PubSubMod.subscribe('itemChanged', this.view.toggleCompleted);
+			
+			PubSubMod.subscribe("count", this.view.updateCount)
         },
         bindEvents : function () {
             var view = this.view,
@@ -231,6 +265,7 @@
                 return;
             }
             this.model.addTodo(title);
+			this.model.getCount();
         },
         _itemId : function (el) {
             var item = $parent(el, 'li');
@@ -242,9 +277,11 @@
         },
         _removeItem : function (id) {
             this.model.removeTodo(id);
+			this.model.getCount();
         },
         _toggleItem : function (id) {
             this.model.toggleTodo(id);
+			this.model.getCount();
         }
     };
     
