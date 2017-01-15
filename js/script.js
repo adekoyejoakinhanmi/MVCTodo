@@ -153,6 +153,7 @@
 
 				todosCount.total++;
 			}
+			console.log(todosCount);
 			
 			PubSubMod.publish("count", todosCount);
 		}
@@ -216,7 +217,8 @@
 		updateCount : function (values) {
 			var self = todoList.View;
 			
-			self.$countActive.innerHTML = values.total;
+			self.$countActive.innerHTML = values.active;
+			self.$countComplete.innerHTML = values.completed;
 		}
     };
     
