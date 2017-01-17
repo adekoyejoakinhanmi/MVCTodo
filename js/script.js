@@ -118,7 +118,7 @@
                     break;
                 }
             }
-			console.log(todos.length, id);
+
             PubSubMod.publish("itemRemoved", id);
         },
         toggleTodo : function (id) {
@@ -129,7 +129,6 @@
             for (i = 0; i < l; i += 1) {
                 if (id === todos[i].id) {
                     todos[i].completed = !todos[i].completed;
-					console.log(todos[i].completed);
                     break;
                 }
             }
@@ -140,12 +139,16 @@
 				todos = this.todos,
 				l = todos.length,
 				data = [];
-
-			for (i = 0; i < l; i += 1) {
-				if (todos[i].completed === query.completed) {
-					data.push(todos[i]);
+			if (query !== "all") {
+				for (i = 0; i < l; i += 1) {
+					if (todos[i].completed === query.completed) {
+						data.push(todos[i]);
+					}
 				}
+			} else if (query === "all") {
+				data = todos;
 			}
+
 			console.log(data);
 			PubSubMod.publish("dataQueried", data);
 		},
@@ -175,14 +178,14 @@
     
     todoList.View = {
         _templateSettings : {
-            todoTmpl : '<li data-id="<%id%>">' +
+            todoTmpl : '<li data-id="<%id%>" class="<%completed%>">' +
                 '<input type="checkbox" class="toggle" <%checked%> >' +
                 '<span><%title%></span>' +
                 '<div class="pull-right btns">' +
                 '<i class="glyphicon glyphicon-remove remove"></i>' +
                 '</div></li>',
             show : function (data) {
-                var valid = this.todoTmpl.replace(/<%id%>/g, data.id).replace(/<%title%>/g, data.title).replace(/<%checked%>/g, data.completed === false ? "" : 'checked');
+                var valid = this.todoTmpl.replace(/<%id%>/g, data.id).replace(/<%title%>/g, data.title).replace(/<%checked%>/g, data.completed === false ? "" : 'checked').replace(/<%completed%>/, data.completed === false ? "" : "completed");
                 return valid;
             }
         },
@@ -191,6 +194,7 @@
             this.$todoList = _("#todo-list");
             this.$showCompleted = _("#completed");
             this.$showActive = _("#active");
+			this.$showAll = _("#all");
 			this.$countNotifier = _("#countNotifier");
             this.$infoBar = _("#info-bar");
             //this.focusTodo();
@@ -290,6 +294,10 @@
 				self._queryModel({completed : true});
 			});
 
+			$on(view.$showAll, "click", function (e) {
+				e.preventDefault();
+				self._queryModel("all");
+			});
 
         },
         _addItem : function (title) {
