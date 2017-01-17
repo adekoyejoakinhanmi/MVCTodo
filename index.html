@@ -11,7 +11,18 @@
     <div class="container">
         
         <div class="row">
-            <div class="col-md-10">
+			<div id="info-bar" class="col-md-6 col-md-offset-3">
+				<p id="countNotifier"></p>
+				<button id="all" class="btn btn-sm btn-default">All</button>
+               <button id="completed" class="btn btn-sm btn-default">
+                    Completed
+                </button>
+                <button id="active" class="btn btn-sm btn-default">
+                    Active
+                </button>
+            </div>
+			
+            <div class="col-md-12">
                 <div class="addTodo form-group">
                     <input type="text" class="form-control" id="newTodo" placeholder="New Task">
                 </div>
@@ -20,16 +31,6 @@
                         <p class="text-center">No Current tasks</p>
                     </div>
                 </ul>
-            </div>
-            <div class="col-md-2">
-               <button id="completed" class="btn btn-primary">
-                    Show completed
-                    <span class="badge completedCount">0</span>
-                </button>
-                <button id="active" class="btn btn-primary">
-                    Show Active
-                    <span class="badge activeCount">0</span>
-                </button>
             </div>
         </div>
     </div>

@@ -180,6 +180,7 @@
             this.$showActive = _("#active");
             this.$countComplete = _(".completedCount");
             this.$countActive = _(".activeCount");
+			this.$countNotifier = _("#countNotifier");
             
             //this.focusTodo();
         },
@@ -216,9 +217,13 @@
         },
 		updateCount : function (values) {
 			var self = todoList.View;
-			
-			self.$countActive.innerHTML = values.active;
-			self.$countComplete.innerHTML = values.completed;
+			if (values.active === 1) {
+				self.$countNotifier.innerHTML = '1 item left';
+			} else if (values.active > 1) {
+				self.$countNotifier.innerHTML = values.active + " items left";
+			} else {
+				self.$countNotifier.innerHTML = "&nbsp;";
+			}
 		}
     };
     
@@ -234,7 +239,7 @@
             PubSubMod.subscribe('itemRemoved', this.view.removeEl);
             PubSubMod.subscribe('itemChanged', this.view.toggleCompleted);
 			
-			PubSubMod.subscribe("count", this.view.updateCount)
+			PubSubMod.subscribe("count", this.view.updateCount);
         },
         bindEvents : function () {
             var view = this.view,

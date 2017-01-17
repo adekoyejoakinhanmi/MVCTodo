@@ -42,13 +42,19 @@ ul#todo-list li span{
 .hidden{
     display: none;
 }
-#completed{
-    margin-bottom: 10px;
-}
 .completed span{
     text-decoration: line-through;
     color: #ccc;
 }
+
+
+#info-bar{
+	margin-bottom: 10px;
+}
+p#countNotifier{
+	display: inline-block;
+}
+
 @media (max-width: 991px){
     #completed {
         margin-bottom: 0px;
