@@ -40,7 +40,7 @@ ul#todo-list li span{
     cursor: pointer;
 }
 .hidden{
-    display: none;
+    visibility: hidden;
 }
 .completed span{
     text-decoration: line-through;
@@ -50,9 +50,11 @@ ul#todo-list li span{
 
 #info-bar{
 	margin-bottom: 10px;
+	height: 31px;
 }
 p#countNotifier{
 	display: inline-block;
+	margin: 0px 90px 0px 0px;
 }
 
 @media (max-width: 991px){

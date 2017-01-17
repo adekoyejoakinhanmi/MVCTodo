@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Todo List &#9679; MVC</title>
     <meta charset="UTF-8">
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
     <link href="css/style.css" rel="stylesheet"/>
@@ -11,7 +11,7 @@
     <div class="container">
         
         <div class="row">
-			<div id="info-bar" class="col-md-6 col-md-offset-3">
+			<div id="info-bar" class="hidden col-md-6 col-md-offset-3">
 				<p id="countNotifier"></p>
 				<button id="all" class="btn btn-sm btn-default">All</button>
                <button id="completed" class="btn btn-sm btn-default">
@@ -20,16 +20,14 @@
                 <button id="active" class="btn btn-sm btn-default">
                     Active
                 </button>
+				<button id="clear" class="btn pull-right btn-sm btn-danger">Clear Completed</button>
             </div>
 			
-            <div class="col-md-12">
+            <div class="col-md-6 col-md-offset-3">
                 <div class="addTodo form-group">
                     <input type="text" class="form-control" id="newTodo" placeholder="New Task">
                 </div>
                 <ul id="todo-list">
-                    <div class="notification panel">
-                        <p class="text-center">No Current tasks</p>
-                    </div>
                 </ul>
             </div>
         </div>

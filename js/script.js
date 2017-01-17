@@ -21,6 +21,7 @@
         * renderAll
     * The Controller will glue the above by -
         * init and binding ++
+	* The pubsub module is responsible for making event annoucements app-wide
     */
     var _ = document.querySelector.bind(document),
         __ = document.querySelectorAll.bind(document),
@@ -111,8 +112,8 @@
                 todos = this.todos,
                 l = todos.length;
             
-            for (i = 0; i < l; i++) {
-                if (id == todos[i]['id']) {
+            for (i = 0; i < l; i += 1) {
+                if (id === todos[i].id) {
                     todos.splice(i, 1);
                     break;
                 }
@@ -126,9 +127,9 @@
                 l = todos.length;
             
             for (i = 0; i < l; i += 1) {
-                if (id === todos[i]['id']) {
-                    todos[i]['completed'] = !todos[i]['completed'];
-					console.log(todos[i]['completed']);
+                if (id === todos[i].id) {
+                    todos[i].completed = !todos[i].completed;
+					console.log(todos[i].completed);
                     break;
                 }
             }
@@ -139,21 +140,20 @@
 				active: 0,
 				completed: 0,
 				total: 0
-			};
-			var i,
+			},
+				i,
                 todos = this.todos,
                 l = todos.length;
             
             for (i = 0; i < l; i += 1) {
-				if (todos[i]['completed']) {
-					todosCount.completed++;
+				if (todos[i].completed) {
+					todosCount.completed += 1;
 				} else {
-					todosCount.active++;
+					todosCount.active += 1;
 				}
 
-				todosCount.total++;
+				todosCount.total += 1;
 			}
-			console.log(todosCount);
 			
 			PubSubMod.publish("count", todosCount);
 		}
@@ -176,12 +176,9 @@
             this.$input = _("#newTodo");
             this.$todoList = _("#todo-list");
             this.$showCompleted = _("#completed");
-            this.$notification = _('.notification');
             this.$showActive = _("#active");
-            this.$countComplete = _(".completedCount");
-            this.$countActive = _(".activeCount");
 			this.$countNotifier = _("#countNotifier");
-            
+            this.$infoBar = _("#info-bar");
             //this.focusTodo();
         },
         renderOne : function (data) {
@@ -207,22 +204,15 @@
         clearInput : function () {
             this.$input.value = "";
         },
-        toggleNotifcation : function () {
-            //console.log(this.$todoList.firstChild);
-            if (this.$todoList.innerHTML !== "") {
-                this.$notification.classList.add("hidden");
-            } else {
-                this.$notification.classList.remove("hidden");
-            }
-        },
 		updateCount : function (values) {
 			var self = todoList.View;
 			if (values.active === 1) {
+				self.$infoBar.classList.remove("hidden");
 				self.$countNotifier.innerHTML = '1 item left';
 			} else if (values.active > 1) {
 				self.$countNotifier.innerHTML = values.active + " items left";
 			} else {
-				self.$countNotifier.innerHTML = "&nbsp;";
+				self.$infoBar.classList.add("hidden");
 			}
 		}
     };
@@ -249,8 +239,7 @@
             $on(view.$input, 'keypress', function (e) {
                 if (e.keyCode === 13) {
                     var val = view.$input.value;
-                    
-                    self.view.toggleNotifcation();
+
                     self._addItem(val);
                     view.clearInput();
                 }
@@ -261,7 +250,6 @@
                 
                 if (e.target.matches('.remove')) {
                     self._removeItem(id);
-                    view.toggleNotifcation();
                 } else if (e.target.matches('.toggle')) {
                     self._toggleItem(id);
                 }
