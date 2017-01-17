@@ -234,14 +234,21 @@
         },
 		updateCount : function (values) {
 			var self = todoList.View;
-			if (values.active === 1) {
+
+			if (values.total > 0) {
 				self.$infoBar.classList.remove("hidden");
-				self.$countNotifier.innerHTML = '1 item left';
-			} else if (values.active > 1) {
-				self.$countNotifier.innerHTML = values.active + " items left";
 			} else {
 				self.$infoBar.classList.add("hidden");
 			}
+
+			if (values.active === 1) {
+				self.$countNotifier.innerHTML = '1 item left';
+			} else if (values.active > 1) {
+				self.$countNotifier.innerHTML = values.active + " items left";
+			}
+		},
+		setLocation : function (location) {
+
 		}
     };
     

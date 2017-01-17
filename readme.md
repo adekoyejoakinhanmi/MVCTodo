@@ -4,7 +4,7 @@ An MVC style todo list written entirely in Vanilla JS to help me learn the under
 
 ## Todos
 	
-- Fixed toggle bug
+- Fixed toggle bug ++
 		
 - Add routing functionality
 		
