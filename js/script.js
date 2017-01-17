@@ -135,6 +135,20 @@
             }
             PubSubMod.publish("itemChanged", id);
         },
+		findAll : function (query) {
+			var i,
+				todos = this.todos,
+				l = todos.length,
+				data = [];
+
+			for (i = 0; i < l; i += 1) {
+				if (todos[i].completed === query.completed) {
+					data.push(todos[i]);
+				}
+			}
+			console.log(data);
+			PubSubMod.publish("dataQueried", data);
+		},
 		getCount : function () {
 			var todosCount = {
 				active: 0,
@@ -190,6 +204,16 @@
                 self.$todoList.insertBefore(htmlToDOM(item), self.$todoList.firstChild);
             }
         },
+		renderAll : function (data) {
+			var i,
+				l = data.length,
+				self = todoList.View;
+
+			self.$todoList.innerHTML = "";
+			for (i = 0; i < l; i += 1) {
+				self.renderOne(data[i]);
+			}
+		},
         removeEl : function (id) {
             var item = _('[data-id="' + id + '"]'),
                 /*Manually Setting value of this*/
@@ -230,6 +254,7 @@
             PubSubMod.subscribe('itemChanged', this.view.toggleCompleted);
 			
 			PubSubMod.subscribe("count", this.view.updateCount);
+			PubSubMod.subscribe("dataQueried", this.view.renderAll);
         },
         bindEvents : function () {
             var view = this.view,
@@ -254,6 +279,18 @@
                     self._toggleItem(id);
                 }
             });
+
+			$on(view.$showActive, "click", function (e) {
+				e.preventDefault();
+				self._queryModel({completed : false});
+			});
+
+			$on(view.$showCompleted, "click", function (e) {
+				e.preventDefault();
+				self._queryModel({completed : true});
+			});
+
+
         },
         _addItem : function (title) {
             if (title.trim() === "") {
@@ -277,7 +314,10 @@
         _toggleItem : function (id) {
             this.model.toggleTodo(id);
 			this.model.getCount();
-        }
+        },
+		_queryModel : function (query) {
+			this.model.findAll(query);
+		}
     };
     
     todoList.Controller.init();
