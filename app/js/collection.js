@@ -1,3 +1,5 @@
+import Todo from './model';
+
 /**
  * Creates a new collection to manage the todo list
  */

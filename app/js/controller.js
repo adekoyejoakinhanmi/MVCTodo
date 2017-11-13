@@ -1,3 +1,5 @@
+import { $parent } from './helpers';
+
 /**
  * Takes a view and a collection and act as the controller within them
  * 

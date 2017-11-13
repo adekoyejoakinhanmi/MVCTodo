@@ -1,3 +1,5 @@
+import { htmlToDOM } from './helpers';
+
 /**
  * View that deals with DOM. It provides two
  * render functions.
