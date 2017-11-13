@@ -90,19 +90,23 @@ class TodoCollection {
     // A default gateway for all requests possible
     // on this collection.
     $get(req) {
+        let activeList = this.$todos.filter(t => !t.completed);
+        let completedList = this.$todos.filter(t => t.completed);
+
         let state = {
             list : [],
             count : {
-                active : this.$todos.filter(f => !f.completed).length,
-                total : this.$todos.length
+                active : activeList.length,
+                total : this.$todos.length,
+                completed : completedList.length
             }
         }
         if (req === 'all') {
             state.list = this.$todos;
         } else if (req === 'completed') {
-            state.list = this.$todos.filter(t => t.completed);
+            state.list = completedList
         } else if (req === 'active') {
-            state.list = this.$todos.filter(t => !t.completed);
+            state.list = activeList
         }
 
         return state;
@@ -139,7 +143,7 @@ class View {
         `;
         return htmlToDOM(item);
     }
-    $filterTmpl({ count : { active : a, total : t} }) {
+    $filterTmpl({ count : { active : a, total : t, completed : c} }) {
         //let active = count['active'];
         let hidden = t <= 0 ? true : false;
         let state = this.$viewState;
@@ -154,7 +158,7 @@ class View {
             <button id="active" class="btn btn-sm btn-default ${state === 'active' ? 'active' : ''}">
                 Active
             </button>
-            <button id="clear" class="btn pull-right btn-sm btn-danger">Clear Completed</button>
+            <button id="clear" class="btn pull-right btn-sm btn-danger ${c <= 0 ? 'disabled' : ''}">Clear Completed</button>
         </div>
         `;
         return htmlToDOM(tmpl);
