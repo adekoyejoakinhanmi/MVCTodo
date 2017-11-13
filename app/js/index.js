@@ -2,4 +2,7 @@ import Collection from './collection';
 import View from './view';
 import Controller from './controller';
 
-new Controller(new View, new Collection);
+const view = new View();
+const collection = new Collection();
+
+new Controller(view, collection);

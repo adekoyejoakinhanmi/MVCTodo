@@ -7,7 +7,7 @@ import { $parent } from './helpers';
  * @param {Object} view The View Instance
  * @param {Object} collection The Collection instance
  */
-export class Controller {
+export default class Controller {
    constructor(view, collection) {
        this.view = view;
        this.collection = collection;

@@ -3,7 +3,7 @@
  * 
  * @param {Object} attrs
  */
-export class Todo {
+export default class Todo {
    constructor(attrs) {
        for (var attr in attrs) {
            this[attr] = attrs[attr]

@@ -3,7 +3,7 @@ import Todo from './model';
 /**
  * Creates a new collection to manage the todo list
  */
-export class TodoCollection {
+export default class TodoCollection {
    constructor() {
        this.todos = [];
    }

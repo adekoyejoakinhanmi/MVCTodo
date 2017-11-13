@@ -7,7 +7,7 @@ import { htmlToDOM } from './helpers';
  *                   to implement faster renders
  *  2. InfoRender -> which renders the info bar
  */
-export class View {
+export default class View {
    constructor() {
        this.viewState = 'all';
        this._listFrag = document.createDocumentFragment();
