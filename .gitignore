@@ -1,2 +1,4 @@
 fonts
 /node_modules
+app/css/bootstrap.min.css
+yarn-error.log
