@@ -1,3 +1,9 @@
+/* @todo :
+ * 1. Rename methods properly
+ * 2. Destructure view's data
+ * 3. Add disabled prop when there are no completed todos
+ * 4. Add localStorage
+ */ 
 function htmlToDOM(html) {
     let parser = new DOMParser();
     let doc = parser.parseFromString(html, "text/html");
@@ -107,7 +113,6 @@ class View {
     constructor() {
         this.$viewState = 'all';
         this._listFrag = document.createDocumentFragment();
-        this._infoFrag = document.createDocumentFragment();
 
         this.$loadDOM();
     }
@@ -122,11 +127,11 @@ class View {
         this.$infoBar.classList.remove('hidden');
         this.$infoBar.innerHTML = '';
     }
-    $todoTmpl(data) {
+    $todoTmpl({id, title, completed}) {
         let item = `
-            <li data-id="${data.id}" class="${data.completed ? 'completed' : ''}">
-                <input type="checkbox" class="toggle" ${data.completed ? 'checked' : ''}/>
-                <span>${data.title}</span>
+            <li data-id="${id}" class="${completed ? 'completed' : ''}">
+                <input type="checkbox" class="toggle" ${completed ? 'checked' : ''}/>
+                <span>${title}</span>
                 <div class="pull-right btns">
                     <i class="glyphicon glyphicon-remove remove"></i>
                 </div>
@@ -134,13 +139,14 @@ class View {
         `;
         return htmlToDOM(item);
     }
-    $filterTmpl(data) {
-        let active = data['count']['active'];
+    $filterTmpl({ count : { active : a, total : t} }) {
+        //let active = count['active'];
+        let hidden = t <= 0 ? true : false;
         let state = this.$viewState;
-        let hidden = data['count']['total'] <= 0 ? true : false;
+        
         let tmpl = `
         <div class="${hidden ? 'hidden' : ''}">
-            <p id="countNotifier">${active} item${active === 1 ? '' : 's'} left</p>
+            <p id="countNotifier">${a} item${a === 1 ? '' : 's'} left</p>
             <button id="all" class="btn btn-sm btn-default ${state === 'all' ? 'active' : ''}">All</button>
             <button id="completed" class="btn btn-sm btn-default ${state === 'completed' ? 'active' : ''}">
                 Completed
@@ -157,8 +163,7 @@ class View {
         let node = this.$todoTmpl(item);
         this._listFrag.appendChild(node);
     }
-    listRender(data) {
-        let list = data['list'];
+    listRender({ list }) {
         // Clear this list
         this._listFrag.innerHTML = '';
 
@@ -213,12 +218,10 @@ class Controller {
         this.view.$input.addEventListener('keypress', (e) => {
             let val = this.view.$input.value;
 
-            // Prevent empty strings
+            /* Prevent empty strings */
             if (!val.trim()) {
                 return;
             }
-            // Otherwise listen for the enter key
-            // and call internal add
             if (e.keyCode === 13) {
                 this._add(val);
             }
