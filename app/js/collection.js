@@ -59,7 +59,7 @@ export default class TodoCollection {
     * Filters the collection for completed items
     */
    _clearComplete() {
-       let list = this.$todos;
+       let list = this.todos;
        this.todos = list.filter(t => !t.completed);
    }
    /**
