@@ -133,7 +133,7 @@ class View {
                 <input type="checkbox" class="toggle" ${completed ? 'checked' : ''}/>
                 <span>${title}</span>
                 <div class="pull-right btns">
-                    <i class="glyphicon glyphicon-remove remove"></i>
+                    <i class="glyphicon glyphicon-trash remove"></i>
                 </div>
             </li>
         `;
