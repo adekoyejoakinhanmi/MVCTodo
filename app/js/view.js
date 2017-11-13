@@ -55,15 +55,19 @@ export default class View {
        
        let tmpl = `
        <div class="${hidden ? 'hidden' : ''}">
-           <p id="countNotifier">${a} item${a === 1 ? '' : 's'} left</p>
-           <button id="all" class="btn btn-sm btn-default ${state === 'all' ? 'active' : ''}">All</button>
-           <button id="completed" class="btn btn-sm btn-default ${state === 'completed' ? 'active' : ''}">
-               Completed
-           </button>
-           <button id="active" class="btn btn-sm btn-default ${state === 'active' ? 'active' : ''}">
-               Active
-           </button>
-           <button id="clear" class="btn pull-right btn-sm btn-danger ${c <= 0 ? 'disabled' : ''}">Clear Completed</button>
+            <div class="clearfix">    
+                <p id="countNotifier">${a} item${a === 1 ? '' : 's'} left</p>
+                <button id="clear" class="btn pull-right btn-sm btn-danger ${c <= 0 ? 'disabled' : ''}">Clear Completed</button>
+            </div>
+            <div class="action-bar">
+                <button id="all" class="btn btn-sm btn-default ${state === 'all' ? 'active' : ''}">All</button>
+                <button id="completed" class="btn btn-sm btn-default ${state === 'completed' ? 'active' : ''}">
+                    Completed
+                </button>
+                <button id="active" class="btn btn-sm btn-default ${state === 'active' ? 'active' : ''}">
+                    Active
+                </button>
+            </div>
        </div>
        `;
        return htmlToDOM(tmpl);

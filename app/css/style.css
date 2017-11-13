@@ -35,14 +35,19 @@ ul#todo-list li span{
     text-decoration: line-through;
     color: #ccc;
 }
-
+.action-bar{
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
 #info-bar{
 	margin-bottom: 10px;
 	height: auto
 }
 p#countNotifier{
 	display: inline-block;
-	margin: 0px 90px 0px 0px;
+    margin: 0px 90px 0px 0px;
+    vertical-align: -webkit-baseline-middle;
 }
 
 @media (max-width: 991px){
