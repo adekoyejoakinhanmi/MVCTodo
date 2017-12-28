@@ -9,6 +9,8 @@ export default class Todo {
            this[attr] = attrs[attr]
        }
    }
+   
+   
    /**
     * Toggle the completed state of the todo
     */
