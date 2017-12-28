@@ -16,6 +16,8 @@ export default class Controller {
        // Initial list render
        this.view.listRender({ list : [] });
    }
+   
+   
    /**
     * Bind all possible events on view
     */
@@ -53,8 +55,10 @@ export default class Controller {
            else {
                this._updateViewState('all');
            }
-       })
+       });
    }
+   
+   
    /**
     * Get the parent's id of a given html element
     * 
@@ -64,6 +68,8 @@ export default class Controller {
        let item = $parent(el, 'li');
        return String(item.dataset.id);
    }
+   
+   
    /**
     * Add a particular todo
     * 
@@ -75,6 +81,8 @@ export default class Controller {
        this._updateView();
        this.view.clearInput();
    }
+   
+   
    /**
     * Remove a particlar todo
     * 
@@ -84,6 +92,8 @@ export default class Controller {
        this.collection.set('remove', id);
        this._updateView();
    }
+   
+   
    /**
     * Update a todo item
     * 
@@ -93,6 +103,8 @@ export default class Controller {
        this.collection.set('update', id);
        this._updateView();
    }
+   
+   
    /**
     * Clear completed todos
     */
@@ -100,6 +112,8 @@ export default class Controller {
        this.collection.set('clearCompleted');
        this._updateView();
    }
+   
+   
    /**
     * Changes the value of the view state
     * @param {String} val 
@@ -108,6 +122,8 @@ export default class Controller {
        this.view.changeViewState(val);
        this._updateView();
    }
+   
+   
    /**
     * Update the view by calling view's render functions
     */
