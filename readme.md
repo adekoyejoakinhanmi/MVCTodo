@@ -4,11 +4,11 @@ MVCTodo is my attempt to implement some features of the TodoMVC project enirely 
 
 ## Design
 
-The app simply implements the all the features of the TodoMVC project except for locationHash change and localStorage. 
+The app simply implements the all the features of the TodoMVC project except for routing and localStorage. 
 
 ## Aim
 
-The main aim was to help me understand and implement OOP and MVC. Initally, I had tried to write the app in 2016 but these concepts proved elusive to me. I have since then tak learnt more about JavaScript and as such rewritten the entire app in ES6 using features such as:
+The main aim was to help me understand and implement OOP and MVC. Initally, I had tried to write the app in 2016 but these concepts proved elusive to me. I have since then learnt more about JavaScript and as such rewritten the entire app in ES6 using features such as:
 
 - Destructuring
 - Module bundling
