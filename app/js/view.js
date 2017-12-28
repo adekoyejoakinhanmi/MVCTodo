@@ -14,6 +14,8 @@ export default class View {
 
        this._loadDOM();
    }
+   
+   
    /**
     * Load the DOM
     */
@@ -22,12 +24,14 @@ export default class View {
        this.$input = document.getElementById('newTodo');
        this.$infoBar = document.getElementById('info-bar');
 
-       // This is alter to current state of UI where classList
+       // This is to alter current state of UI where classList
        // contains hidden. ALso the current content should be
        // removed.
        this.$infoBar.classList.remove('hidden');
        this.$infoBar.innerHTML = '';
    }
+   
+   
    /**
     * Todo Item template
     * @param {Object} param0 Destructures todo object
@@ -45,6 +49,8 @@ export default class View {
        `;
        return htmlToDOM(item);
    }
+   
+   
    /**
     * Info bar template
     * @param {Object} param0 Destructes count object from given state object 
@@ -72,6 +78,8 @@ export default class View {
        `;
        return htmlToDOM(tmpl);
    }
+   
+   
    /**
     * Helps the list render function
     * 
@@ -81,6 +89,8 @@ export default class View {
        let node = this.$todoTmpl(item);
        this._listFrag.appendChild(node);
    }
+   
+   
    /**
     * Render list
     * @param {Object} param0 Destructures list object from given state
@@ -105,6 +115,8 @@ export default class View {
        this.$list.innerHTML = '';
        this.$list.appendChild(this._listFrag);
    }
+   
+   
    infoRender(data) {
        let infoBar = this.$infoTmpl(data);
        // Update DOM
@@ -112,9 +124,13 @@ export default class View {
        this.$infoBar.appendChild(infoBar);
 
    }
+   
+   
    clearInput() {
        this.$input.value = '';
    }
+   
+   
    /**
     * Changes view state 
     * @param {String} newState 
