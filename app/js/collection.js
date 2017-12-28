@@ -7,12 +7,16 @@ export default class TodoCollection {
    constructor() {
        this.todos = [];
    }
+   
+   
    /**
     * ID helper of this collection
     */
    $cid() {
        return Math.random().toString(16).slice(2);
    }
+   
+   
    /**
     * Finds the index of a given todo in the collection
     * based on the internal id of the todo
@@ -22,6 +26,8 @@ export default class TodoCollection {
    $getById(id) {
        return this.todos.map(t => t.id).indexOf(id);
    }
+   
+   
    /**
     * Adds a new todo to the collection
     * 
@@ -36,6 +42,8 @@ export default class TodoCollection {
        };
        this.todos.push(new Todo(todo));
    }
+   
+   
    /**
     * Removes a todo from the collection based on 
     * given id
@@ -46,6 +54,8 @@ export default class TodoCollection {
        let idx = this.$getById(id);
        this.todos.splice(idx, 1);
    }
+   
+   
    /**
     * Updates the completed state of a todo in the collection
     * 
@@ -55,6 +65,8 @@ export default class TodoCollection {
        let idx = this.$getById(id);
        this.todos[idx].toggleCompleted();
    }
+   
+   
    /**
     * Filters the collection for completed items
     */
@@ -62,6 +74,8 @@ export default class TodoCollection {
        let list = this.todos;
        this.todos = list.filter(t => !t.completed);
    }
+   
+   
    /**
     * Gives access to retrive data from the collection 
     * based on req
@@ -92,6 +106,8 @@ export default class TodoCollection {
 
        return state;
    }
+   
+   
    /**
     * Provides a way to perform actions on the collection.
     * 
