@@ -66,6 +66,7 @@ export default class View {
                 <button id="clear" class="btn pull-right btn-sm btn-danger ${c <= 0 ? 'disabled' : ''}">Clear Completed</button>
             </div>
             <div class="action-bar">
+                <div class="btn-group">
                 <button id="all" class="btn btn-sm btn-default ${state === 'all' ? 'active' : ''}">All</button>
                 <button id="completed" class="btn btn-sm btn-default ${state === 'completed' ? 'active' : ''}">
                     Completed
@@ -73,6 +74,7 @@ export default class View {
                 <button id="active" class="btn btn-sm btn-default ${state === 'active' ? 'active' : ''}">
                     Active
                 </button>
+                </div>
             </div>
        </div>
        `;
